@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free appliance electricity cost calculator. Estimate the hourly, daily, monthly and yearly cost of running an appliance.">
+  <title>Appliance Running Cost Calculator</title>
+  <style>
+    :root { --bg:#f5f7fb; --card:#fff; --text:#172033; --muted:#667085; --border:#dfe4ec; --accent:#315efb; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+    .wrap { max-width:760px; margin:0 auto; padding:32px 18px 60px; }
+    header { text-align:center; margin-bottom:24px; }
+    h1 { margin:0 0 8px; font-size:clamp(28px,6vw,42px); }
+    .intro { color:var(--muted); margin:0 auto; max-width:620px; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; box-shadow:0 8px 30px rgba(20,30,50,.06); margin-bottom:18px; }
+    label { display:block; font-weight:700; margin:16px 0 7px; }
+    label:first-child { margin-top:0; }
+    input { width:100%; padding:13px 14px; border:1px solid var(--border); border-radius:10px; font-size:16px; }
+    .hint { color:var(--muted); font-size:13px; margin-top:5px; }
+    button { width:100%; border:0; border-radius:10px; padding:14px; margin-top:20px; background:var(--accent); color:white; font-size:16px; font-weight:700; cursor:pointer; }
+    button:hover { opacity:.92; }
+    .results { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:20px; }
+    .result { background:#f8f9fc; border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--muted); font-size:13px; }
+    .result strong { display:block; margin-top:3px; font-size:22px; }
+    .note { color:var(--muted); font-size:13px; margin-top:16px; }
+    footer { text-align:center; color:var(--muted); font-size:13px; margin-top:28px; }
+    @media (max-width:520px) { .results { grid-template-columns:1fr; } .card { padding:18px; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>Appliance Running Cost Calculator</h1>
+      <p class="intro">Estimate how much an appliance costs to run based on its power, your electricity price and how long you use it.</p>
+    </header>
+
+    <section class="card">
+      <label for="watts">Appliance power (watts)</label>
+      <input id="watts" type="number" min="0" step="1" value="2000" placeholder="e.g. 2000">
+      <div class="hint">Check the appliance label or manual. Example: a 2 kW heater = 2000 watts.</div>
+
+      <label for="rate">Electricity price (€ per kWh)</label>
+      <input id="rate" type="number" min="0" step="0.001" value="0.35" placeholder="e.g. 0.35">
+      <div class="hint">Enter the price shown on your electricity bill. This calculator does not assume a fixed tariff.</div>
+
+      <label for="hours">Hours used per day</label>
+      <input id="hours" type="number" min="0" step="0.1" value="3" placeholder="e.g. 3">
+
+      <label for="days">Days used per month</label>
+      <input id="days" type="number" min="0" max="31" step="1" value="30" placeholder="e.g. 30">
+
+      <button id="calculate">Calculate cost</button>
+
+      <div class="results" aria-live="polite">
+        <div class="result"><span>Cost per hour</span><strong id="hourly">€0.00</strong></div>
+        <div class="result"><span>Cost per day</span><strong id="daily">€0.00</strong></div>
+        <div class="result"><span>Cost per month</span><strong id="monthly">€0.00</strong></div>
+        <div class="result"><span>Cost per year*</span><strong id="yearly">€0.00</strong></div>
+      </div>
+
+      <p class="note">*Yearly estimate assumes the same monthly usage for 12 months. Actual cost can differ if your appliance cycles on/off or your electricity tariff changes.</p>
+    </section>
+
+    <section class="card">
+      <h2>How the calculation works</h2>
+      <p>Electricity used (kWh) = appliance power (watts) ÷ 1000 × hours used.</p>
+      <p>Cost = electricity used × your electricity price per kWh.</p>
+      <p>Use your own tariff for the most useful estimate.</p>
+    </section>
+
+    <footer>Free calculator • No account required • No information is sent to a server</footer>
+  </main>
+
+  <script>
+    const money = n => "€" + n.toFixed(2);
+
+    function calculate() {
+      const watts = Number(document.getElementById("watts").value) || 0;
+      const rate = Number(document.getElementById("rate").value) || 0;
+      const hours = Number(document.getElementById("hours").value) || 0;
+      const days = Number(document.getElementById("days").value) || 0;
+
+      const hourly = (watts / 1000) * rate;
+      const daily = hourly * hours;
+      const monthly = daily * days;
+      const yearly = monthly * 12;
+
+      document.getElementById("hourly").textContent = money(hourly);
+      document.getElementById("daily").textContent = money(daily);
+      document.getElementById("monthly").textContent = money(monthly);
+      document.getElementById("yearly").textContent = money(yearly);
+    }
+
+    document.getElementById("calculate").addEventListener("click", calculate);
+    ["watts","rate","hours","days"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calculate);
+    });
+    calculate();
+  </script>
+</body>
+</html>
